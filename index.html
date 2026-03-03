@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Precificação</title>
+
+<style>
+
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* BODY */
+body{
+    background:#000;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:16px;
+}
+
+/* CONTAINER */
+.container{
+    width:100%;
+    max-width:420px;
+    background:linear-gradient(180deg,#ff6a00,#ff8a00);
+    border-radius:22px;
+    padding:16px;
+}
+
+/* CARD */
+.card{
+    background:#0f0f0f;
+    border-radius:18px;
+    padding:18px;
+    border:2px solid #ff7a00;
+}
+
+/* TITULO */
+h1{
+    color:#fff;
+    text-align:center;
+    font-size:1.5rem;
+    margin-bottom:6px;
+}
+
+p{
+    color:#ffc285;
+    text-align:center;
+    font-size:0.85rem;
+    margin-bottom:16px;
+}
+
+/* FORM */
+.form{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+}
+
+@media(min-width:600px){
+    .form{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+/* INPUTS */
+.field{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+}
+
+.field label{
+    font-size:0.75rem;
+    color:#ffae5c;
+    margin-bottom:4px;
+}
+
+.field input{
+    width:100%;
+    max-width:100%;
+    background:#111;
+    border:1px solid #ff7a00;
+    border-radius:10px;
+    padding:10px 12px;
+    color:#fff;
+    font-size:0.9rem;
+    outline:none;
+}
+
+/* BOTAO */
+button{
+    margin-top:14px;
+    width:100%;
+    background:#ff6a00;
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    background:#ff8a00;
+}
+
+/* RESULTADOS */
+.results{
+    margin-top:18px;
+    border:2px solid #ff7a00;
+    border-radius:14px;
+    padding:14px;
+    display:none;
+}
+
+/* PREÇO */
+.price{
+    background:linear-gradient(90deg,#ff6a00,#ff9a00);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    color:#fff;
+    font-size:1.4rem;
+    font-weight:bold;
+}
+
+/* LUCRO */
+.profit{
+    display:flex;
+    justify-content:space-between;
+    margin:12px 0;
+    color:#ffcb90;
+    font-weight:bold;
+    font-size:0.9rem;
+    border-bottom:1px solid #ff7a00;
+    padding-bottom:6px;
+}
+
+/* COMPOSIÇÃO */
+.breakdown{
+    padding-top:6px;
+}
+
+.breakdown h3{
+    color:#ffae5c;
+    font-size:0.85rem;
+    margin-bottom:6px;
+}
+
+.line{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.8rem;
+    color:#eee;
+    margin:3px 0;
+}
+
+.total{
+    color:#ffae5c;
+    font-weight:bold;
+    margin-top:6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>Calculadora de Precificação</h1>
+<p>Descubra seu preço ideal de venda</p>
+
+<!-- FORM -->
+<div class="form">
+
+    <div class="field">
+        <label>Custo do Produto (R$)</label>
+        <input type="number" id="custo" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Taxa Marketplace (%)</label>
+        <input type="number" id="taxa" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Frete (R$)</label>
+        <input type="number" id="frete" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Imposto (%)</label>
+        <input type="number" id="imposto" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Embalagem (R$)</label>
+        <input type="number" id="embalagem" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Custo por Unidade Vendida (R$)</label>
+        <input type="number" id="custoUnidade" step="0.01">
+    </div>
+
+    <div class="field">
+        <label>Lucro (%)</label>
+        <input type="number" id="lucro" step="0.01">
+    </div>
+
+</div>
+
+<button onclick="calcular()">Calcular</button>
+
+<!-- RESULTADOS -->
+<div class="results" id="results">
+
+    <div class="price" id="precoVenda">R$ 0,00</div>
+
+    <div class="profit">
+        <span>Lucro por venda</span>
+        <span id="lucroValor">R$ 0,00</span>
+    </div>
+
+    <div class="breakdown">
+
+        <h3>Composição do Preço</h3>
+
+        <div class="line">
+            <span>Custos Fixos</span>
+            <span id="custosFixos">R$ 0,00</span>
+        </div>
+
+        <div class="line">
+            <span>Taxa Marketplace</span>
+            <span id="taxaValor">R$ 0,00</span>
+        </div>
+
+        <div class="line">
+            <span>Imposto</span>
+            <span id="impostoValor">R$ 0,00</span>
+        </div>
+
+        <div class="line total">
+            <span>Total Deduções</span>
+            <span id="totalPerc">0%</span>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* FORMATA MOEDA */
+function formatar(valor){
+    return "R$ " + valor.toFixed(2).replace(".",",");
+}
+
+/* PEGA VALOR COM TRATAMENTO COMPLETO */
+function getValor(id){
+
+    let el = document.getElementById(id);
+
+    if(!el) return 0;
+
+    let valor = el.value;
+
+    if(!valor) return 0;
+
+    // Remove espaços
+    valor = valor.trim();
+
+    // Troca vírgula por ponto
+    valor = valor.replace(",", ".");
+
+    // Remove caracteres inválidos
+    valor = valor.replace(/[^0-9.]/g, "");
+
+    let num = parseFloat(valor);
+
+    return isNaN(num) ? 0 : num;
+}
+
+/* FUNÇÃO PRINCIPAL */
+function calcular(){
+
+    /* ENTRADAS */
+    const custo = getValor("custo");
+    const frete = getValor("frete");
+    const embalagem = getValor("embalagem");
+    const custoUnidade = getValor("custoUnidade");
+
+    const taxa = getValor("taxa");
+    const imposto = getValor("imposto");
+    const lucro = getValor("lucro");
+
+    /* CUSTOS FIXOS (AGORA FUNCIONA SEMPRE) */
+    const custosFixos =
+        custo +
+        frete +
+        embalagem +
+        custoUnidade;
+
+    /* DEDUÇÕES (%) */
+    const totalPerc =
+        taxa +
+        imposto +
+        lucro;
+
+    if(totalPerc >= 100){
+        alert("A soma das deduções não pode ser 100% ou mais.");
+        return;
+    }
+
+    /* PREÇO IDEAL */
+    const preco =
+        custosFixos /
+        (1 - totalPerc / 100);
+
+    /* VALORES EM R$ */
+    const taxaR = preco * taxa / 100;
+    const impostoR = preco * imposto / 100;
+    const lucroR = preco * lucro / 100;
+
+    /* MOSTRAR RESULTADO */
+    document.getElementById("results").style.display = "block";
+
+    document.getElementById("precoVenda").innerText = formatar(preco);
+    document.getElementById("lucroValor").innerText = formatar(lucroR);
+
+    document.getElementById("custosFixos").innerText = formatar(custosFixos);
+    document.getElementById("taxaValor").innerText = formatar(taxaR);
+    document.getElementById("impostoValor").innerText = formatar(impostoR);
+    document.getElementById("totalPerc").innerText = totalPerc.toFixed(2) + "%";
+}
+
+</script>
+
+</body>
+</html>
